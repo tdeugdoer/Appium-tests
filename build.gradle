@@ -1,0 +1,50 @@
+plugins {
+    id 'java'
+    id "io.qameta.allure" version "2.12.0"
+}
+
+group = 'org.tserashkevich'
+version = '1.0-SNAPSHOT'
+
+ext {
+    javaVersion = '21'
+    testngVersion = '7.11.0'
+    selenideVersion = '7.9.0'
+    javaClient = '9.4.0'
+    assertjVersion = '3.27.3'
+    lombokVersion = '1.18.38'
+    logbackVersion = '1.5.18'
+    allureVersion = '2.29.1'
+}
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(javaVersion))
+    }
+}
+
+dependencies {
+    implementation "com.codeborne:selenide:$selenideVersion"
+    implementation "com.codeborne:selenide-appium:$selenideVersion"
+    implementation "io.appium:java-client:$javaClient"
+    testImplementation "org.assertj:assertj-core:$assertjVersion"
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    implementation "ch.qos.logback:logback-classic:$logbackVersion"
+    implementation "io.qameta.allure:allure-testng:$allureVersion"
+    implementation "io.qameta.allure:allure-selenide:$allureVersion"
+
+    testImplementation "org.testng:testng:$testngVersion"
+    testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+    testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+}
+
+test {
+    useTestNG() {
+        suites 'src/test/resources/testng.xml'
+    }
+}
