@@ -9,17 +9,17 @@ import pages.main.MainPage;
 import pages.searchStation.StationSearchPage;
 import pages.timetable.TrainTimetablePage;
 import pages.welcome.WelcomePage;
+import ui.BaseTest;
 import utils.DateUtils;
 
 import java.time.Duration;
+import java.util.List;
 
-import static com.codeborne.selenide.Condition.exist;
-import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.CollectionCondition.sizeGreaterThan;
 import static io.qameta.allure.Allure.step;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Listeners(AndroidUIListener.class)
-public class MainPageTest {
+public class MainPageTest extends BaseTest {
     private final WelcomePage welcomePage = new WelcomePage();
     private final MainPage mainPage = new MainPage();
     private final AndroidPermissions androidPermissions = new AndroidPermissions();
@@ -27,21 +27,17 @@ public class MainPageTest {
     private final TrainTimetablePage trainTimetablePage = new TrainTimetablePage();
 
     private String selectedDate;
-    private String fromTime;
-    private String toTime;
-    private String fromStation;
-    private String toStation;
-    private String trainNumber;
-    private String trainName;
+    private List<String> fromTime;
+    private List<String> toTime;
+    private List<String> fromStation;
+    private List<String> toStation;
+    private List<String> trainNumber;
+    private List<String> trainName;
 
     @Test(description = "Найти билеты Минск - Дрогичин-Город на завтрашний день")
     public void findTickets() {
         step("Переход к главной странице без регистрации", () -> welcomePage.getContinueWithoutRegisterButton().click());
-        step("Ознакомление с информацией", () ->
-                mainPage.getInfoMessageOkButton()
-                        .shouldBe(visible, Duration.ofSeconds(10))
-                        .click()
-        );
+        step("Ознакомление с информацией", mainPage::okAllInfoMessages);
         step("Соглашения Android об доступе к местоположению и уведомлениям", () -> {
             androidPermissions.clickIfVisible(androidPermissions.getAllowForegroundLocationTrackingButton());
             androidPermissions.clickIfVisible(androidPermissions.getAllowButton());
@@ -60,54 +56,43 @@ public class MainPageTest {
         });
         step("Поиск поезда", () -> mainPage.getFindButton().click());
         step("Получение данных о поездке", () -> {
-            selectedDate = trainTimetablePage.getSelectedDate().shouldBe(exist, Duration.ofSeconds(60)).getText();
-            fromTime = trainTimetablePage.getFromTime().getText();
-            toTime = trainTimetablePage.getToTime().getText();
-            fromStation = trainTimetablePage.getFromStation().getText();
-            toStation = trainTimetablePage.getToStation().getText();
-            trainNumber = trainTimetablePage.getTrainNumber().getText();
-            trainName = trainTimetablePage.getTrainName().getText();
+            selectedDate = trainTimetablePage.getSelectedDate().getText();
+            fromTime = trainTimetablePage.getFromTime().shouldBe(sizeGreaterThan(0), Duration.ofMinutes(2)).texts();
+            toTime = trainTimetablePage.getToTime().shouldBe(sizeGreaterThan(0), Duration.ofMinutes(2)).texts();
+            fromStation = trainTimetablePage.getFromStation().shouldBe(sizeGreaterThan(0), Duration.ofMinutes(2)).texts();
+            toStation = trainTimetablePage.getToStation().shouldBe(sizeGreaterThan(0), Duration.ofMinutes(2)).texts();
+            trainNumber = trainTimetablePage.getTrainNumber().shouldBe(sizeGreaterThan(0), Duration.ofMinutes(2)).texts();
+            trainName = trainTimetablePage.getTrainName().shouldBe(sizeGreaterThan(0), Duration.ofMinutes(2)).texts();
         });
-        step("Проверка полученных значений", () -> {
-//            String selectedDate = trainTimetablePage.getSelectedDate().shouldBe(exist, Duration.ofSeconds(60)).getText();
-//            String fromTime = trainTimetablePage.getFromTime().getText();
-//            String toTime = trainTimetablePage.getToTime().getText();
-//            String fromStation = trainTimetablePage.getFromStation().getText();
-//            String toStation = trainTimetablePage.getToStation().getText();
-//            String trainNumber = trainTimetablePage.getTrainNumber().getText();
-//            String trainName = trainTimetablePage.getTrainName().getText();
+        step("Проверка полученных значений", () -> SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(selectedDate)
+                    .as("Проверка даты, для которой отображается расписание")
+                    .contains(DateUtils.getTomorrowDateString());
 
-            SoftAssertions.assertSoftly(softly -> {
-                assertThat(selectedDate)
-                        .as("Проверка даты, для которой отображается расписание")
-                        .contains(DateUtils.getTomorrowDateString());
+            softly.assertThat(fromTime)
+                    .as("Проверка времени отправления")
+                    .contains("22:57");
 
-                assertThat(fromTime)
-                        .as("Проверка времени отправления")
-                        .isEqualTo("22:57");
+            softly.assertThat(toTime)
+                    .as("Проверка времени прибытия")
+                    .contains("05:51");
 
-                assertThat(toTime)
-                        .as("Проверка времени прибытия")
-                        .isEqualTo("05:51");
+            softly.assertThat(fromStation)
+                    .as("Проверка станции отправления")
+                    .contains("Минск-Пассажирский");
 
-                assertThat(fromStation)
-                        .as("Проверка станции отправления")
-                        .isEqualTo("Минск-Пассажирский");
+            softly.assertThat(toStation)
+                    .as("Проверка станции прибытия")
+                    .contains("Дрогичин-Город");
 
-                assertThat(toStation)
-                        .as("Проверка станции прибытия")
-                        .isEqualTo("Дрогичин-Город");
+            softly.assertThat(trainNumber)
+                    .as("Проверка номера поезда")
+                    .contains("657Б");
 
-                assertThat(trainNumber)
-                        .as("Проверка номера поезда")
-                        .isEqualTo("657Б");
-
-                assertThat(trainName)
-                        .as("Проверка названия поезда")
-                        .isEqualTo("Полоцк — Брест-Центральный");
-            });
-        });
-
+            softly.assertThat(trainName)
+                    .as("Проверка названия поезда")
+                    .contains("Полоцк — Брест-Центральный");
+        }));
     }
 
 }

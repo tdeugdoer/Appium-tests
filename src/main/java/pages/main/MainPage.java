@@ -4,6 +4,9 @@ import com.codeborne.selenide.SelenideElement;
 import lombok.Getter;
 import pages.BasePage;
 
+import java.time.Duration;
+
+import static com.codeborne.selenide.Condition.exist;
 import static com.codeborne.selenide.appium.SelenideAppium.$;
 import static io.appium.java_client.AppiumBy.androidUIAutomator;
 import static io.appium.java_client.AppiumBy.id;
@@ -15,5 +18,12 @@ public class MainPage extends BasePage {
     private final SelenideElement destinationStationField = $(id("by.rw.client:id/destination_station_selection_container"));
     private final SelenideElement tomorrowButton = $(androidUIAutomator("text(\"Завтра\")"));
     private final SelenideElement findButton = $(id("by.rw.client:id/btn_find_timetable"));
+
+    public MainPage okAllInfoMessages() {
+        while (infoMessageOkButton.is(exist, Duration.ofSeconds(10))) {
+            infoMessageOkButton.click();
+        }
+        return this;
+    }
 
 }

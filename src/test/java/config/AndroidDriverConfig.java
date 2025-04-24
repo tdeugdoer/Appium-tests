@@ -20,7 +20,7 @@ public class AndroidDriverConfig implements WebDriverProvider {
                 .setAppActivity("by.rw.client/by.iba.railwayclient.presentation.signup.WelcomeActivity")
                 .setAutomationName("UiAutomator2")
                 .setNewCommandTimeout(Duration.ofSeconds(60))
-                .setAutoGrantPermissions(true)
+                .autoGrantPermissions()
                 .setNoReset(false)
                 .setPlatformName("Android");
         try {
