@@ -12,6 +12,7 @@ ext {
     selenideVersion = '7.9.0'
     javaClient = '9.4.0'
     assertjVersion = '3.27.3'
+    awaitilityVersion = '4.3.0'
     lombokVersion = '1.18.38'
     logbackVersion = '1.5.18'
     allureVersion = '2.29.1'
@@ -31,7 +32,7 @@ dependencies {
     implementation "com.codeborne:selenide:$selenideVersion"
     implementation "com.codeborne:selenide-appium:$selenideVersion"
     implementation "io.appium:java-client:$javaClient"
-    testImplementation "org.assertj:assertj-core:$assertjVersion"
+    implementation "org.awaitility:awaitility:$awaitilityVersion"
     compileOnly "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
@@ -39,6 +40,7 @@ dependencies {
     implementation "io.qameta.allure:allure-selenide:$allureVersion"
 
     testImplementation "org.testng:testng:$testngVersion"
+    testImplementation "org.assertj:assertj-core:$assertjVersion"
     testCompileOnly "org.projectlombok:lombok:$lombokVersion"
     testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
 }
